@@ -8,6 +8,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseInit";
 import Navbar from "./components/Navbar";
 import PeopleList from "./components/PeopleList";
+import { useAuth } from "./context/AuthContext";
 
 const lato = Lato({
   subsets: ["latin"],
@@ -15,12 +16,12 @@ const lato = Lato({
 });
 
 const Home = () => {
+  const { currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <main className={clsx("min-h-screen", lato.className)}>
       <Navbar />
-
       {/* Search box */}
       <section className="w-full px-8 pb-8">
         <div
@@ -43,7 +44,9 @@ const Home = () => {
       </section>
 
       {/* Dev section (only show to developers) */}
-      <DevSection />
+      {currentUser && currentUser.uid === "VJuU3HEj1RMEmJFbtxLjWNtm9Zz1" && (
+        <DevSection />
+      )}
 
       {/* Sort section */}
       <div className="p-8 flex w-full justify-end">
@@ -64,7 +67,6 @@ const Home = () => {
           </ul>
         </div>
       </div>
-
       {/* People list */}
       <PeopleList searchTerm={searchTerm} />
     </main>
