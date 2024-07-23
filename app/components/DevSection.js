@@ -1,5 +1,33 @@
 import clsx from "clsx";
+import { addDoc, collection, doc, writeBatch } from "firebase/firestore";
 import React, { useState } from "react";
+import { db } from "../../firebaseInit";
+
+const addToFirestore = async (person) => {
+  try {
+    const docRef = await addDoc(collection(db, "people"), person);
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
+
+const batchWriteToFirestore = async (peopleList) => {
+  const batch = writeBatch(db);
+  const collectionRef = collection(db, "people");
+
+  peopleList.forEach((person) => {
+    const docRef = doc(collectionRef); // Automatically generate a unique ID
+    batch.set(docRef, person);
+  });
+
+  try {
+    await batch.commit();
+    console.log("Batch write successful");
+  } catch (e) {
+    console.error("Error writing batch: ", e);
+  }
+};
 
 const DevSection = () => {
   const [addNum, setAddNum] = useState(1);
@@ -22,6 +50,12 @@ const DevSection = () => {
 
     // Add these peopleData to firestore
     const peopleData = (await people.json()).people;
+
+    // peopleData.forEach((person) => {
+    //   addToFirestore(person);
+    // });
+
+    batchWriteToFirestore(peopleData);
 
     console.log(peopleData);
 
