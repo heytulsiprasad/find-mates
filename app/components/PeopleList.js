@@ -1,7 +1,6 @@
 import { collection, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebaseInit";
-import { useAuth } from "../context/AuthContext";
 import PeopleCard from "./PeopleCard";
 
 const listenToCollection = (collectionName, callback) => {
@@ -18,18 +17,15 @@ const listenToCollection = (collectionName, callback) => {
 };
 
 const PeopleList = ({ searchTerm }) => {
-  const { currentUser } = useAuth();
   const [peopleList, setPeopleList] = useState([]);
 
   useEffect(() => {
-    if (currentUser) {
-      const unsubscribe = listenToCollection("people", (people) => {
-        setPeopleList(people);
-      });
+    const unsubscribe = listenToCollection("people", (people) => {
+      setPeopleList(people);
+    });
 
-      return () => unsubscribe();
-    }
-  }, [currentUser]);
+    return () => unsubscribe();
+  }, []);
 
   console.log(peopleList);
 
