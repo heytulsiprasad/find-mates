@@ -47,7 +47,7 @@ const Navbar = () => {
     <>
       <nav className="flex justify-between items-center px-8 py-4">
         <div className="text-2xl">
-          <h1>People Finder</h1>
+          <h1>Find Mates</h1>
         </div>
 
         {/* Avatar (login) */}

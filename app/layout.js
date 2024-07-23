@@ -6,7 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "People Finder",
+  title: "Find Mates",
   description: "Find people you want to meet",
 };
 
