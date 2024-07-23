@@ -7,6 +7,7 @@ import DevSection from "./components/DevSection";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseInit";
 import Navbar from "./components/Navbar";
+import PeopleList from "./components/PeopleList";
 
 const lato = Lato({
   subsets: ["latin"],
@@ -65,6 +66,7 @@ const Home = () => {
       </div>
 
       {/* People list */}
+      <PeopleList searchTerm={searchTerm} />
     </main>
   );
 };

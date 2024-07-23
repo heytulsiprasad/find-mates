@@ -5,7 +5,16 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  theme: {},
+  theme: {
+    extend: {
+      screens: {
+        xlmax: { max: "90rem" },
+        lgmax: { max: "68rem" },
+        mdmax: { max: "45rem" },
+        smmax: { max: "35rem" },
+      },
+    },
+  },
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
