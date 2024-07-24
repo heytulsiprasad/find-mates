@@ -49,7 +49,7 @@ const Home = () => {
       )}
 
       {/* Sort section */}
-      <div className="p-8 flex w-full justify-end">
+      {/* <div className="p-8 flex w-full justify-end">
         <div className="dropdown dropdown-bottom dropdown-end">
           <div tabIndex={0} role="button" className="btn m-1">
             Sort By
@@ -66,7 +66,8 @@ const Home = () => {
             </li>
           </ul>
         </div>
-      </div>
+      </div> */}
+
       {/* People list */}
       <PeopleList searchTerm={searchTerm} />
     </main>

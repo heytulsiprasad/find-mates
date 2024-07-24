@@ -1,16 +1,14 @@
 import clsx from "clsx";
-import { addDoc, collection, doc, writeBatch } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  limit,
+  query,
+  writeBatch,
+} from "firebase/firestore";
 import React, { useState } from "react";
 import { db } from "../../firebaseInit";
-
-const addToFirestore = async (person) => {
-  try {
-    const docRef = await addDoc(collection(db, "people"), person);
-    console.log("Document written with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-};
 
 const batchWriteToFirestore = async (peopleList) => {
   const batch = writeBatch(db);
@@ -29,9 +27,29 @@ const batchWriteToFirestore = async (peopleList) => {
   }
 };
 
+const batchDeleteFromFirestore = async (deleteNum) => {
+  const batch = writeBatch(db);
+  const collectionRef = collection(db, "people");
+
+  // Fetch the documents to delete
+  const peopleQuery = query(collectionRef, limit(Number(deleteNum)));
+  const snapshot = await getDocs(peopleQuery);
+
+  snapshot.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+
+  try {
+    await batch.commit();
+    console.log("Batch delete successful");
+  } catch (e) {
+    console.error("Error deleting batch: ", e);
+  }
+};
+
 const DevSection = () => {
-  const [addNum, setAddNum] = useState(1);
-  const [deleteNum, setDeleteNum] = useState(1);
+  const [addNum, setAddNum] = useState(0);
+  const [deleteNum, setDeleteNum] = useState(0);
   const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -45,29 +63,28 @@ const DevSection = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ num: addNum }),
+      body: JSON.stringify({ num: Number(addNum) }),
     });
 
     // Add these peopleData to firestore
     const peopleData = (await people.json()).people;
 
-    // peopleData.forEach((person) => {
-    //   addToFirestore(person);
-    // });
-
     batchWriteToFirestore(peopleData);
 
-    console.log(peopleData);
-
-    if (people.ok) setAddNum(1);
+    if (people.ok) setAddNum("");
 
     setAdding(false);
     setLoading(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setDeleting(true);
     setLoading(true);
+
+    await batchDeleteFromFirestore(deleteNum);
+
+    setDeleteNum("");
+
     setTimeout(() => {
       setDeleting(false);
       setLoading(false);
@@ -83,9 +100,7 @@ const DevSection = () => {
             type="number"
             value={addNum}
             className="input w-max"
-            onChange={(e) => setAddNum(Number(e.target.value))}
-            min="1"
-            max="50"
+            onChange={(e) => setAddNum(e.target.value)}
           />
           <button
             type="button"
@@ -105,9 +120,7 @@ const DevSection = () => {
             type="number"
             value={deleteNum}
             className="input w-max"
-            onChange={(e) => setDeleteNum(Number(e.target.value))}
-            min="1"
-            max="50"
+            onChange={(e) => setDeleteNum(e.target.value)}
           />
           <button
             type="button"

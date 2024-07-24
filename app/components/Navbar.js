@@ -41,8 +41,6 @@ const Navbar = () => {
     document.getElementById("confirm_logout").showModal();
   };
 
-  console.log({ currentUser });
-
   return (
     <>
       <nav className="flex justify-between items-center px-8 py-4">

@@ -27,10 +27,8 @@ const PeopleList = ({ searchTerm }) => {
     return () => unsubscribe();
   }, []);
 
-  console.log(peopleList);
-
   return (
-    <div className="px-8">
+    <div className="px-8 mt-12">
       <div className="grid grid-cols-3 lgmax:grid-cols-2 mdmax:grid-cols-1 gap-x-4 gap-y-8 place-items-center">
         {peopleList.map(
           ({
