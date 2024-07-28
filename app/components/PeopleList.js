@@ -37,6 +37,8 @@ const PeopleList = ({ searchTerm }) => {
     return count;
   }, []);
 
+  const TOTAL_PAGES = Math.ceil(totalPeople / PEOPLE_PER_PAGE);
+
   // Fetch data on initial render
   useEffect(() => {
     const fetchData = async () => {
@@ -75,11 +77,7 @@ const PeopleList = ({ searchTerm }) => {
       setPrevDisabled(false);
     }
 
-    const totalPages = Math.ceil(totalPeople / PEOPLE_PER_PAGE);
-
-    console.log({ page, totalPages, totalPeople });
-
-    if (page === totalPages) {
+    if (page === TOTAL_PAGES) {
       setNextDisabled(true);
     } else {
       setNextDisabled(false);
@@ -138,6 +136,8 @@ const PeopleList = ({ searchTerm }) => {
     <div className="px-8 mt-12">
       {/* Pagination */}
       <Paginator
+        page={page}
+        totalPages={TOTAL_PAGES}
         handleNext={handleNext}
         handlePrevious={handlePrev}
         nextDisabled={nextDisabled}
