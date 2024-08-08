@@ -9,13 +9,14 @@ import {
   getCountFromServer,
   limitToLast,
   endBefore,
+  where,
 } from "firebase/firestore";
 import React, { useCallback, useEffect, useState } from "react";
 import { db } from "../../firebaseInit";
 import PeopleCard from "./PeopleCard";
 import Paginator from "./Paginator";
 
-const PEOPLE_PER_PAGE = 6;
+const PEOPLE_PER_PAGE = 10;
 
 const PeopleList = ({ searchTerm }) => {
   const [peopleList, setPeopleList] = useState([]);
@@ -26,50 +27,62 @@ const PeopleList = ({ searchTerm }) => {
   const [page, setPage] = useState(1);
   const [totalPeople, setTotalPeople] = useState(0);
 
-  // Get total count of peopls in firestore
-  const getTotalCount = useCallback(async () => {
+  // Get total count of people in Firestore (based on search term)
+  const getTotalCount = useCallback(async (searchTerm) => {
     const collectionRef = collection(db, "people");
-    const q = query(collectionRef);
+    const q = query(
+      collectionRef,
+      where("firstName", ">=", searchTerm),
+      where("firstName", "<=", searchTerm + "\uf8ff")
+    );
 
     const aggregateQuerySnapshot = await getCountFromServer(q);
     const count = aggregateQuerySnapshot.data().count;
 
-    return count;
+    setTotalPeople(count);
   }, []);
 
   const TOTAL_PAGES = Math.ceil(totalPeople / PEOPLE_PER_PAGE);
 
-  // Fetch data on initial render
-  useEffect(() => {
-    const fetchData = async () => {
-      const collectionRef = collection(db, "people");
-      const q = query(
+  // Fetch data based on searchTerm
+  const fetchData = useCallback(async (searchTerm) => {
+    const collectionRef = collection(db, "people");
+    let q;
+
+    if (searchTerm) {
+      q = query(
         collectionRef,
+        where("firstName", ">=", searchTerm),
+        where("firstName", "<=", searchTerm + "\uf8ff"),
         orderBy("firstName"),
         limit(PEOPLE_PER_PAGE)
       );
+    } else {
+      q = query(collectionRef, orderBy("firstName"), limit(PEOPLE_PER_PAGE));
+    }
 
-      const querySnapshot = await getDocs(q);
-      const items = [];
-      querySnapshot.forEach((doc) => {
-        items.push(doc.data());
-      });
+    const querySnapshot = await getDocs(q);
+    const items = [];
+    querySnapshot.forEach((doc) => {
+      items.push(doc.data());
+    });
 
-      console.log("first fetch: ", items);
+    console.log("fetch: ", items);
 
-      setPeopleList(items);
-      setAfterThis(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
-      // Get total count of people and store in state
-      const totalCount = await getTotalCount();
-      setTotalPeople(totalCount);
-    };
-
-    fetchData();
+    setPeopleList(items);
+    setAfterThis(querySnapshot.docs[querySnapshot.docs.length - 1]);
   }, []);
 
-  // Make next and previous buttons disabled/enabled based
-  // on page count
+  // Fetch data on initial render and when searchTerm changes
+  useEffect(() => {
+    // Fetch data based on searchTerm
+    fetchData(searchTerm);
+
+    // Get total count of people and store in state
+    getTotalCount(searchTerm);
+  }, [searchTerm]);
+
+  // Make next and previous buttons disabled/enabled based on page count
   useEffect(() => {
     if (page === 1) {
       setPrevDisabled(true);
