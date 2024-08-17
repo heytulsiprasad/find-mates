@@ -16,14 +16,12 @@ import { db } from "../../firebaseInit";
 import PeopleCard from "./PeopleCard";
 import Paginator from "./Paginator";
 
-const PEOPLE_PER_PAGE = 10;
+const PEOPLE_PER_PAGE = 6;
 
 const PeopleList = ({ searchTerm }) => {
   const [peopleList, setPeopleList] = useState([]);
   const [afterThis, setAfterThis] = useState(null);
   const [beforeThis, setBeforeThis] = useState(null);
-  const [nextDisabled, setNextDisabled] = useState(false);
-  const [prevDisabled, setPrevDisabled] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPeople, setTotalPeople] = useState(0);
 
@@ -82,21 +80,6 @@ const PeopleList = ({ searchTerm }) => {
     getTotalCount(searchTerm);
   }, [searchTerm]);
 
-  // Make next and previous buttons disabled/enabled based on page count
-  useEffect(() => {
-    if (page === 1) {
-      setPrevDisabled(true);
-    } else {
-      setPrevDisabled(false);
-    }
-
-    if (page === TOTAL_PAGES) {
-      setNextDisabled(true);
-    } else {
-      setNextDisabled(false);
-    }
-  }, [page, totalPeople]);
-
   const handleNext = async () => {
     const collectionRef = collection(db, "people");
     const q = query(
@@ -153,8 +136,8 @@ const PeopleList = ({ searchTerm }) => {
         totalPages={TOTAL_PAGES}
         handleNext={handleNext}
         handlePrevious={handlePrev}
-        nextDisabled={nextDisabled}
-        prevDisabled={prevDisabled}
+        nextDisabled={page === TOTAL_PAGES}
+        prevDisabled={page === 1}
       />
 
       <div className="grid grid-cols-3 lgmax:grid-cols-2 mdmax:grid-cols-1 gap-x-4 gap-y-8 place-items-center">

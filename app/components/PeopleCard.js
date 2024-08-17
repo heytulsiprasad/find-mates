@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 
 const PeopleCard = ({ avatar, birthday, email, fullName, jobTitle, sex }) => {
